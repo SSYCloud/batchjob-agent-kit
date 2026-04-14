@@ -46,7 +46,7 @@ jobs:
           fi
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} GOWORK=off \
             go build \
-              -ldflags "-X github.com/cocovs/batchjob-agent-kit/cli/internal/version.Version=${{ github.ref_name }}" \
+              -ldflags "-X github.com/SSYCloud/batchjob-agent-kit/cli/internal/version.Version=${{ github.ref_name }}" \
               -o "$output_path" \
               ./cmd/batchjob-cli
       - name: Upload CLI artifact
@@ -105,7 +105,7 @@ jobs:
           fi
 
           tap_dir="$RUNNER_TEMP/homebrew-tap"
-          git clone "https://x-access-token:${HOMEBREW_TAP_GITHUB_TOKEN}@github.com/cocovs/homebrew-tap.git" "$tap_dir"
+          git clone "https://x-access-token:${HOMEBREW_TAP_GITHUB_TOKEN}@github.com/SSYCloud/homebrew-tap.git" "$tap_dir"
           ./scripts/render-homebrew-formula.sh --tag "$RELEASE_TAG" --checksums release/checksums.txt > "$tap_dir/Formula/batchjob-cli.rb"
 
           cd "$tap_dir"
