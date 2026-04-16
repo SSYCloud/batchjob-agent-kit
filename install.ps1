@@ -16,6 +16,7 @@ function Resolve-SkillDir {
   switch ($AgentName) {
     "codex" { return "$HOME\.codex\skills\assemble-flow" }
     "claude" { return "$HOME\.claude\skills\assemble-flow" }
+    "openclaw" { return "$HOME\.openclaw\workspace\skills\assemble-flow" }
     default { throw "unsupported agent: $AgentName" }
   }
 }

@@ -22,6 +22,7 @@
   },
   "skills": [
     "codex/assemble-flow",
-    "claude/assemble-flow"
+    "claude/assemble-flow",
+    "openclaw/assemble-flow"
   ]
 }

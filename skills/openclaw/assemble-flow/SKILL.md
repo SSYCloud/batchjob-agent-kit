@@ -1,0 +1,179 @@
+---
+name: assemble-flow
+description: Use assemble-flow when the user mentions AssembleFlow, batchjob, batchflow, 批处理, 批量处理, 模板提交, Excel 模板批量执行, run submit, or artifact/result backfill workflows.
+---
+
+# assemble-flow
+
+Use this skill when the user is referring to our AssembleFlow-hosted batch-processing workflow through `assemble-flow`, including when they still use older or looser names such as `batchjob`, `batchflow`, “批处理”, “批量处理”, “批量跑一下”, “提交 Excel 模板”, “回填结果”, or “下载批量产物” instead of naming AssembleFlow explicitly.
+
+## When To Use
+
+- The user wants batch text-to-image or text-to-image-to-video generation.
+- The user says `AssembleFlow`, `batchjob`, `batchflow`, “批处理”, “批量处理”, “批量任务”, “批量生成”, “批量跑模板”, or similar wording that implies our AssembleFlow workflow.
+- The user wants to submit or validate an official Excel template, backfill results into Excel, watch a batch run, or download batch artifacts.
+- The user is comfortable using a developer tool or agent-assisted CLI workflow.
+- The task can be expressed as repeated structured rows instead of a one-off chat response.
+
+## When Not To Use
+
+- The user only needs a single immediate generation in chat.
+- The task is exploratory and not yet structured enough for batch input.
+- `BATCHJOB_SERVER` or `BATCHJOB_TOKEN` is not configured and the user does not want setup help.
+
+## Command Pattern
+
+1. Check environment:
+   `assemble-flow doctor`
+2. Upload reusable raw input files when the local file is large and should not be pasted into agent context:
+   `assemble-flow input-asset upload <file>`
+3. Discover executable models when step-level model choice matters:
+   `assemble-flow model list --step-type image-generate`
+   `assemble-flow model get <model-id>`
+4. Discover available templates:
+   `assemble-flow template list`
+5. Inspect one template:
+   `assemble-flow template schema <template-id>`
+6. Default to the official Excel workflow:
+   `assemble-flow template download <template-id>`
+   `assemble-flow template validate-file <template-id> <xlsx-path>`
+   `assemble-flow template submit-file <template-id> <xlsx-path>`
+   `assemble-flow template backfill-results <run-id> <xlsx-path>`
+7. Use JSON/JSONL only when the user explicitly wants a programmatic non-Excel path.
+8. Submit a JSON/JSONL run:
+   `assemble-flow run submit <template-id> -f rows.jsonl`
+9. Watch the run:
+   `assemble-flow run watch <run-id>`
+10. List or download artifacts:
+   `assemble-flow artifact list <run-id>`
+   `assemble-flow artifact download <run-id>`
+
+## Confirmation Rule
+
+Before any command that actually submits work to the hosted BatchJob service, get an
+explicit second confirmation from the user in the current conversation.
+
+Treat the interaction as a simple three-state flow:
+
+1. `default-prep`
+   The user is exploring, asking for help, or speaking in a generic way such as
+   “帮我跑个批处理”, “帮我跑一下”, or “按你来”.
+   In this state, stay in the default Excel workflow only.
+
+2. `auto-run-candidate`
+   The user explicitly asks the AI to execute, for example:
+   “你直接帮我自动跑”, “直接帮我提交”, “你替我跑”, “你替我执行”.
+   In this state, do not submit yet. First produce an execution summary and wait.
+
+3. `confirmed-to-run`
+   The user replies with an explicit confirmation after seeing the execution summary,
+   for example:
+   “确认提交”, “提交吧”, “开始跑”, or “继续执行”.
+   Only in this state may the AI actually submit work.
+
+This applies to:
+
+- `assemble-flow template submit-file <template-id> <xlsx-path>`
+- `assemble-flow run submit <template-id> -f rows.jsonl`
+
+Do not silently submit just because the user asked for exploration, validation,
+schema inspection, or preparation steps. Validation, download, schema inspection,
+model lookup, doctor, asset upload, artifact listing, and result backfill do not
+need this extra confirmation because they do not start a paid batch run by
+themselves.
+
+If the user is only in `auto-run-candidate`, the AI must stop at the summary stage.
+No submit, no watch, and no artifact download are allowed before the second
+confirmation.
+
+The execution summary must include:
+
+- template ID
+- input file path or input source
+- row count or task size
+- expected execution action
+- estimated cost if available, otherwise say that cost is only available after submit
+- a clear instruction such as: `回复“确认提交”后我才会开始执行`
+
+If the user replies with a pause or withdrawal signal such as “先别跑” or “等一下”,
+stay in preparation mode and do not execute.
+
+## Error Handling
+
+If a command fails, first run:
+
+`assemble-flow doctor`
+
+Use that result to quickly decide whether the problem is:
+
+- local environment wiring
+- an outdated CLI release
+- server-side behavior
+
+Do this before guessing template, model, or run-level causes.
+
+## Current MVP Scope
+
+The public CLI MVP currently supports:
+
+- `assemble-flow doctor`
+- `assemble-flow input-asset upload <file>`
+- `assemble-flow model list --step-type <step-type>`
+- `assemble-flow model get <model-id>`
+- `assemble-flow template list`
+- `assemble-flow template schema <template-id>`
+- `assemble-flow template download <template-id>`
+- `assemble-flow template backfill-results <run-id> <xlsx-path>`
+- `assemble-flow template validate-file <template-id> <xlsx-path>`
+- `assemble-flow template submit-file <template-id> <xlsx-path>`
+- `assemble-flow run submit <template-id> -f rows.jsonl`
+- `assemble-flow run watch <run-id>`
+- `assemble-flow artifact list <run-id>`
+- `assemble-flow artifact download <run-id>`
+
+## Large Local Files
+
+If the user wants to batch-process local code files, large text files, or local images,
+do not paste those files into the agent context when avoidable. Prefer:
+
+1. `assemble-flow input-asset upload <file>`
+2. keep the returned `input_asset_id`
+3. continue preparing the structured JSONL / Excel input in smaller steps
+
+Phase 1 currently covers upload only. Structured-input references to `input_asset_id`
+will be added later.
+
+## Default Behavior
+
+Unless the user explicitly asks for a JSON or JSONL workflow, default to the official
+Excel template workflow.
+
+When using:
+
+- `assemble-flow template submit-file <template-id> <xlsx-path>`
+- `assemble-flow template backfill-results <run-id> <xlsx-path>`
+
+assume the workbook itself is the source of truth. By default, `template backfill-results`
+writes results back into the same workbook path. Only use `--output-file` when the
+user explicitly wants a separate workbook copy.
+
+## 控制台访问
+
+当用户询问如何访问 AssembleFlow / BatchJob 控制台，或者 agent 成功提交、执行、
+回填了一次批处理任务后，应主动提示当前测试环境控制台入口：
+
+- 控制台页面：`https://batchjob-test.shengsuanyun.com/home/workflow-runs`
+- 根地址：`https://batchjob-test.shengsuanyun.com/`
+- Batch API：`https://batchjob-test.shengsuanyun.com/batch`
+
+如果用户还没有登录，提示其先通过胜算云主站登录，再返回控制台页面：
+
+- 登录入口：`https://www.shengsuanyun.com/login`
+
+必要时可以补充说明：当前测试控制台和 batch 测试环境使用同一域名，批处理接口走该域名下
+的 `/batch` 路径。
+
+在成功执行 `submit`、`watch` 或 `backfill` 后，优先顺手补一句控制台查看方式，例如：
+
+- `你也可以在控制台查看：https://batchjob-test.shengsuanyun.com/home/workflow-runs`
+- 如果已经拿到具体 `run_id`，可以补充说明用户可在该页面搜索或打开最新记录查看。

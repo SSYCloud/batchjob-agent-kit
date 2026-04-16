@@ -3,7 +3,7 @@
 Public distribution repository for:
 
 - `assemble-flow`
-- agent skill packs for Codex / Claude
+- agent skill packs for Codex / Claude / OpenClaw
 - install scripts
 - examples
 - release workflows
@@ -54,6 +54,7 @@ Useful flags:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/install.sh | bash -s -- --agent claude
+curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/install.sh | bash -s -- --agent openclaw
 curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/install.sh | bash -s -- --no-brew
 curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/install.sh | bash -s -- --version v0.1.0
 ```
@@ -68,6 +69,7 @@ Useful flags:
 
 ```powershell
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/install.ps1))) -Agent claude
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/install.ps1))) -Agent openclaw
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/install.ps1))) -Version v0.1.0
 ```
 
@@ -78,6 +80,18 @@ $HOME\AppData\Local\Programs\assemble-flow
 ```
 
 If that directory is not already in `PATH`, add it before using `assemble-flow`.
+
+### OpenClaw Skill Path
+
+When `--agent openclaw` is selected, the installer places `SKILL.md` under:
+
+```bash
+~/.openclaw/workspace/skills/assemble-flow/SKILL.md
+```
+
+This repository currently treats OpenClaw support as a compatibility packaging target.
+The skill content is installed into the OpenClaw workspace skill directory, but runtime
+loading behavior still depends on the user's OpenClaw environment and configuration.
 
 ## Uninstall
 
@@ -99,12 +113,14 @@ Useful flags:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/uninstall.sh | bash -s -- --agent claude
+curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/uninstall.sh | bash -s -- --agent openclaw
 curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/uninstall.sh | bash -s -- --cli-only
 curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/uninstall.sh | bash -s -- --skill-only
 ```
 
 ```powershell
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/uninstall.ps1))) -Agent claude
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/uninstall.ps1))) -Agent openclaw
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/uninstall.ps1))) -CliOnly
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/uninstall.ps1))) -SkillOnly
 ```
@@ -122,7 +138,7 @@ brew tap ssycloud/tap
 brew install assemble-flow
 ```
 
-Direct Homebrew commands install the CLI only. If you also want the Codex or Claude skill pack, use the installer above so the skill is installed too.
+Direct Homebrew commands install the CLI only. If you also want the Codex, Claude, or OpenClaw skill pack, use the installer above so the skill is installed too.
 
 ## Local Build
 

@@ -12,7 +12,7 @@ usage() {
 Usage: uninstall.sh [options]
 
 Options:
-  --agent <codex|claude>   Remove the matching skill pack (default: codex)
+  --agent <codex|claude|openclaw>   Remove the matching skill pack (default: codex)
   --install-dir <path>     Directory containing assemble-flow (default: ~/.local/bin)
   --skill-dir <path>       Override the destination directory for SKILL.md
   --cli-only               Remove only the CLI
@@ -67,6 +67,9 @@ resolve_skill_dir() {
       ;;
     claude)
       printf '%s\n' "$HOME/.claude/skills/assemble-flow"
+      ;;
+    openclaw)
+      printf '%s\n' "$HOME/.openclaw/workspace/skills/assemble-flow"
       ;;
     *)
       echo "unsupported agent for automatic skill uninstall: $AGENT" >&2

@@ -13,7 +13,7 @@ usage() {
 Usage: install.sh [options]
 
 Options:
-  --agent <codex|claude>   Install the matching skill pack (default: codex)
+  --agent <codex|claude|openclaw>   Install the matching skill pack (default: codex)
   --install-dir <path>     Directory for assemble-flow (default: ~/.local/bin)
   --skill-dir <path>       Override the destination directory for SKILL.md
   --version <tag|latest>   GitHub release tag to install (default: latest)
@@ -86,6 +86,9 @@ resolve_skill_dir() {
       ;;
     claude)
       printf '%s\n' "$HOME/.claude/skills/assemble-flow"
+      ;;
+    openclaw)
+      printf '%s\n' "$HOME/.openclaw/workspace/skills/assemble-flow"
       ;;
     *)
       echo "unsupported agent for automatic skill install: $AGENT" >&2
