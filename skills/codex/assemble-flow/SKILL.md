@@ -156,3 +156,24 @@ When using:
 assume the workbook itself is the source of truth. By default, `template backfill-results`
 writes results back into the same workbook path. Only use `--output-file` when the
 user explicitly wants a separate workbook copy.
+
+## 控制台访问
+
+当用户询问如何访问 AssembleFlow / BatchJob 控制台，或者 agent 成功提交、执行、
+回填了一次批处理任务后，应主动提示当前测试环境控制台入口：
+
+- 控制台页面：`https://batchjob-test.shengsuanyun.com/home/workflow-runs`
+- 根地址：`https://batchjob-test.shengsuanyun.com/`
+- Batch API：`https://batchjob-test.shengsuanyun.com/batch`
+
+如果用户还没有登录，提示其先通过胜算云主站登录，再返回控制台页面：
+
+- 登录入口：`https://www.shengsuanyun.com/login`
+
+必要时可以补充说明：当前测试控制台和 batch 测试环境使用同一域名，批处理接口走该域名下
+的 `/batch` 路径。
+
+在成功执行 `submit`、`watch` 或 `backfill` 后，优先顺手补一句控制台查看方式，例如：
+
+- `你也可以在控制台查看：https://batchjob-test.shengsuanyun.com/home/workflow-runs`
+- 如果已经拿到具体 `run_id`，可以补充说明用户可在该页面搜索或打开最新记录查看。
