@@ -40,20 +40,20 @@ jobs:
         working-directory: cli
         run: |
           mkdir -p ../dist
-          output_path="../dist/assemble-flow-${{ matrix.goos }}-${{ matrix.goarch }}"
+          output_path="../dist/loomloom-${{ matrix.goos }}-${{ matrix.goarch }}"
           if [ "${{ matrix.goos }}" = "windows" ]; then
             output_path="${output_path}.exe"
           fi
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} GOWORK=off \
             go build \
-              -ldflags "-X github.com/SSYCloud/AssembleFlow/cli/internal/version.Version=${{ github.ref_name }}" \
+              -ldflags "-X github.com/SSYCloud/loomloom/cli/internal/version.Version=${{ github.ref_name }}" \
               -o "$output_path" \
-              ./cmd/assemble-flow
+              ./cmd/loomloom
       - name: Upload CLI artifact
         uses: actions/upload-artifact@v4
         with:
-          name: assemble-flow-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: dist/assemble-flow-${{ matrix.goos }}-${{ matrix.goarch }}*
+          name: loomloom-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: dist/loomloom-${{ matrix.goos }}-${{ matrix.goarch }}*
 
   package-assets:
     runs-on: ubuntu-latest
@@ -70,17 +70,17 @@ jobs:
             name="$(basename "$binary")"
             staging="$(mktemp -d)"
             if [[ "$name" == *.exe ]]; then
-              cp "$binary" "$staging/assemble-flow.exe"
-              (cd "$staging" && zip -q "release.zip" assemble-flow.exe)
+              cp "$binary" "$staging/loomloom.exe"
+              (cd "$staging" && zip -q "release.zip" loomloom.exe)
               mv "$staging/release.zip" "release/${name%.exe}.zip"
             else
-              cp "$binary" "$staging/assemble-flow"
-              tar -C "$staging" -czf "release/${name}.tar.gz" assemble-flow
+              cp "$binary" "$staging/loomloom"
+              tar -C "$staging" -czf "release/${name}.tar.gz" loomloom
             fi
             rm -rf "$staging"
-          done < <(find dist -type f -name 'assemble-flow-*' | sort)
-          tar -czf release/assemble-flow-skills.tar.gz skills
-          (cd . && zip -qr release/assemble-flow-skills.zip skills)
+          done < <(find dist -type f -name 'loomloom-*' | sort)
+          tar -czf release/loomloom-skills.tar.gz skills
+          (cd . && zip -qr release/loomloom-skills.zip skills)
           cp install.sh install.ps1 uninstall.sh uninstall.ps1 manifest.json README.md release/
           (cd release && sha256sum * > checksums.txt)
       - name: Upload packaged assets
@@ -100,24 +100,24 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           if [ -z "$HOMEBREW_TAP_GITHUB_TOKEN" ]; then
-            echo "HOMEBREW_TAP_GITHUB_TOKEN is required to publish Formula/assemble-flow.rb" >&2
+            echo "HOMEBREW_TAP_GITHUB_TOKEN is required to publish Formula/loomloom.rb" >&2
             exit 1
           fi
 
           tap_dir="$RUNNER_TEMP/homebrew-tap"
           git clone "https://x-access-token:${HOMEBREW_TAP_GITHUB_TOKEN}@github.com/SSYCloud/homebrew-tap.git" "$tap_dir"
-          ./scripts/render-homebrew-formula.sh --tag "$RELEASE_TAG" --checksums release/checksums.txt > "$tap_dir/Formula/assemble-flow.rb"
+          ./scripts/render-homebrew-formula.sh --tag "$RELEASE_TAG" --checksums release/checksums.txt > "$tap_dir/Formula/loomloom.rb"
           rm -f "$tap_dir/Formula/batchjob-cli.rb"
 
           cd "$tap_dir"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if [[ -z "$(git status --short -- Formula/assemble-flow.rb Formula/batchjob-cli.rb)" ]]; then
-            echo "Formula/assemble-flow.rb is already up to date"
+          if [[ -z "$(git status --short -- Formula/loomloom.rb Formula/batchjob-cli.rb)" ]]; then
+            echo "Formula/loomloom.rb is already up to date"
             exit 0
           fi
 
           git add -A Formula
-          git commit -m "assemble-flow ${RELEASE_TAG}"
+          git commit -m "loomloom ${RELEASE_TAG}"
           git push origin main

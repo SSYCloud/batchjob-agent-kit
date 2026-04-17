@@ -55,43 +55,43 @@ checksum_for() {
   printf '%s\n' "$value"
 }
 
-darwin_arm64_sha="$(checksum_for "assemble-flow-darwin-arm64.tar.gz")"
-darwin_amd64_sha="$(checksum_for "assemble-flow-darwin-amd64.tar.gz")"
-linux_arm64_sha="$(checksum_for "assemble-flow-linux-arm64.tar.gz")"
-linux_amd64_sha="$(checksum_for "assemble-flow-linux-amd64.tar.gz")"
+darwin_arm64_sha="$(checksum_for "loomloom-darwin-arm64.tar.gz")"
+darwin_amd64_sha="$(checksum_for "loomloom-darwin-amd64.tar.gz")"
+linux_arm64_sha="$(checksum_for "loomloom-linux-arm64.tar.gz")"
+linux_amd64_sha="$(checksum_for "loomloom-linux-amd64.tar.gz")"
 
 cat <<EOF
-class AssembleFlow < Formula
-  desc "Developer CLI for AssembleFlow workflows"
-  homepage "https://github.com/SSYCloud/AssembleFlow"
+class Loomloom < Formula
+  desc "Developer CLI for LoomLoom workflows"
+  homepage "https://github.com/SSYCloud/loomloom"
   version "$version"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/SSYCloud/AssembleFlow/releases/download/$tag/assemble-flow-darwin-arm64.tar.gz"
+      url "https://github.com/SSYCloud/loomloom/releases/download/$tag/loomloom-darwin-arm64.tar.gz"
       sha256 "$darwin_arm64_sha"
     else
-      url "https://github.com/SSYCloud/AssembleFlow/releases/download/$tag/assemble-flow-darwin-amd64.tar.gz"
+      url "https://github.com/SSYCloud/loomloom/releases/download/$tag/loomloom-darwin-amd64.tar.gz"
       sha256 "$darwin_amd64_sha"
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/SSYCloud/AssembleFlow/releases/download/$tag/assemble-flow-linux-arm64.tar.gz"
+      url "https://github.com/SSYCloud/loomloom/releases/download/$tag/loomloom-linux-arm64.tar.gz"
       sha256 "$linux_arm64_sha"
     else
-      url "https://github.com/SSYCloud/AssembleFlow/releases/download/$tag/assemble-flow-linux-amd64.tar.gz"
+      url "https://github.com/SSYCloud/loomloom/releases/download/$tag/loomloom-linux-amd64.tar.gz"
       sha256 "$linux_amd64_sha"
     end
   end
 
   def install
-    bin.install "assemble-flow"
+    bin.install "loomloom"
   end
 
   test do
-    assert_match "Developer CLI for AssembleFlow workflows", shell_output("#{bin}/assemble-flow --help")
+    assert_match "Developer CLI for LoomLoom workflows", shell_output("#{bin}/loomloom --help")
   end
 end
 EOF

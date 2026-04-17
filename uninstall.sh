@@ -13,7 +13,7 @@ Usage: uninstall.sh [options]
 
 Options:
   --agent <codex|claude|openclaw>   Remove the matching skill pack (default: codex)
-  --install-dir <path>     Directory containing assemble-flow (default: ~/.local/bin)
+  --install-dir <path>     Directory containing loomloom (default: ~/.local/bin)
   --skill-dir <path>       Override the destination directory for SKILL.md
   --cli-only               Remove only the CLI
   --skill-only             Remove only the skill pack
@@ -63,13 +63,13 @@ resolve_skill_dir() {
   fi
   case "$AGENT" in
     codex)
-      printf '%s\n' "$HOME/.codex/skills/assemble-flow"
+      printf '%s\n' "$HOME/.codex/skills/loomloom"
       ;;
     claude)
-      printf '%s\n' "$HOME/.claude/skills/assemble-flow"
+      printf '%s\n' "$HOME/.claude/skills/loomloom"
       ;;
     openclaw)
-      printf '%s\n' "$HOME/.openclaw/workspace/skills/assemble-flow"
+      printf '%s\n' "$HOME/.openclaw/workspace/skills/loomloom"
       ;;
     *)
       echo "unsupported agent for automatic skill uninstall: $AGENT" >&2
@@ -84,17 +84,17 @@ uninstall_homebrew_cli() {
   if ! command -v brew >/dev/null 2>&1; then
     return
   fi
-  if ! brew list --versions assemble-flow >/dev/null 2>&1; then
+  if ! brew list --versions loomloom >/dev/null 2>&1; then
     return
   fi
-  brew uninstall assemble-flow
-  echo "removed Homebrew formula: assemble-flow"
+  brew uninstall loomloom
+  echo "removed Homebrew formula: loomloom"
   removed_any=1
 }
 
 if [[ "$REMOVE_CLI" -eq 1 ]]; then
   uninstall_homebrew_cli
-  cli_path="$INSTALL_DIR/assemble-flow"
+  cli_path="$INSTALL_DIR/loomloom"
   if [[ -f "$cli_path" ]]; then
     rm -f "$cli_path"
     echo "removed: $cli_path"

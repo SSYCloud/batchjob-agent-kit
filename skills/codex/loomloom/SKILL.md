@@ -1,16 +1,16 @@
 ---
-name: assemble-flow
-description: Use assemble-flow when the user mentions AssembleFlow, batchjob, batchflow, 批处理, 批量处理, 模板提交, Excel 模板批量执行, run submit, or artifact/result backfill workflows.
+name: loomloom
+description: Use loomloom when the user mentions LoomLoom, batchjob, batchflow, 批处理, 批量处理, 模板提交, Excel 模板批量执行, run submit, or artifact/result backfill workflows.
 ---
 
-# assemble-flow
+# loomloom
 
-Use this skill when the user is referring to our AssembleFlow-hosted batch-processing workflow through `assemble-flow`, including when they still use older or looser names such as `batchjob`, `batchflow`, “批处理”, “批量处理”, “批量跑一下”, “提交 Excel 模板”, “回填结果”, or “下载批量产物” instead of naming AssembleFlow explicitly.
+Use this skill when the user is referring to our LoomLoom-hosted batch-processing workflow through `loomloom`, including when they still use older or looser names such as `batchjob`, `batchflow`, “批处理”, “批量处理”, “批量跑一下”, “提交 Excel 模板”, “回填结果”, or “下载批量产物” instead of naming LoomLoom explicitly.
 
 ## When To Use
 
 - The user wants batch text-to-image or text-to-image-to-video generation.
-- The user says `AssembleFlow`, `batchjob`, `batchflow`, “批处理”, “批量处理”, “批量任务”, “批量生成”, “批量跑模板”, or similar wording that implies our AssembleFlow workflow.
+- The user says `LoomLoom`, `batchjob`, `batchflow`, “批处理”, “批量处理”, “批量任务”, “批量生成”, “批量跑模板”, or similar wording that implies our LoomLoom workflow.
 - The user wants to submit or validate an official Excel template, backfill results into Excel, watch a batch run, or download batch artifacts.
 - The user is comfortable using a developer tool or agent-assisted CLI workflow.
 - The task can be expressed as repeated structured rows instead of a one-off chat response.
@@ -24,26 +24,26 @@ Use this skill when the user is referring to our AssembleFlow-hosted batch-proce
 ## Command Pattern
 
 1. Check environment:
-   `assemble-flow doctor`
+   `loomloom doctor`
 2. Upload reusable raw input files when the local file is large and should not be pasted into agent context:
-   `assemble-flow input-asset upload <file>`
+   `loomloom input-asset upload <file>`
 3. Discover available templates:
-   `assemble-flow template list`
-5. Inspect one template:
-   `assemble-flow template schema <template-id>`
+   `loomloom template list`
+4. Inspect one template:
+   `loomloom template schema <template-id>`
 6. Default to the official Excel workflow:
-   `assemble-flow template download <template-id>`
-   `assemble-flow template validate-file <template-id> <xlsx-path>`
-   `assemble-flow template submit-file <template-id> <xlsx-path>`
-   `assemble-flow template backfill-results <run-id> <xlsx-path>`
+   `loomloom template download <template-id>`
+   `loomloom template validate-file <template-id> <xlsx-path>`
+   `loomloom template submit-file <template-id> <xlsx-path>`
+   `loomloom template backfill-results <run-id> <xlsx-path>`
 7. Use JSON/JSONL only when the user explicitly wants a programmatic non-Excel path.
 8. Submit a JSON/JSONL run:
-   `assemble-flow run submit <template-id> -f rows.jsonl`
+   `loomloom run submit <template-id> -f rows.jsonl`
 9. Watch the run:
-   `assemble-flow run watch <run-id>`
+   `loomloom run watch <run-id>`
 10. List or download artifacts:
-   `assemble-flow artifact list <run-id>`
-   `assemble-flow artifact download <run-id>`
+   `loomloom artifact list <run-id>`
+   `loomloom artifact download <run-id>`
 
 ## Confirmation Rule
 
@@ -70,8 +70,8 @@ Treat the interaction as a simple three-state flow:
 
 This applies to:
 
-- `assemble-flow template submit-file <template-id> <xlsx-path>`
-- `assemble-flow run submit <template-id> -f rows.jsonl`
+- `loomloom template submit-file <template-id> <xlsx-path>`
+- `loomloom run submit <template-id> -f rows.jsonl`
 
 Do not silently submit just because the user asked for exploration, validation,
 schema inspection, or preparation steps. Validation, download, schema inspection,
@@ -99,7 +99,7 @@ stay in preparation mode and do not execute.
 
 If a command fails, first run:
 
-`assemble-flow doctor`
+`loomloom doctor`
 
 Use that result to quickly decide whether the problem is:
 
@@ -113,25 +113,25 @@ Do this before guessing template, model, or run-level causes.
 
 The public CLI MVP currently supports:
 
-- `assemble-flow doctor`
-- `assemble-flow input-asset upload <file>`
-- `assemble-flow template list`
-- `assemble-flow template schema <template-id>`
-- `assemble-flow template download <template-id>`
-- `assemble-flow template backfill-results <run-id> <xlsx-path>`
-- `assemble-flow template validate-file <template-id> <xlsx-path>`
-- `assemble-flow template submit-file <template-id> <xlsx-path>`
-- `assemble-flow run submit <template-id> -f rows.jsonl`
-- `assemble-flow run watch <run-id>`
-- `assemble-flow artifact list <run-id>`
-- `assemble-flow artifact download <run-id>`
+- `loomloom doctor`
+- `loomloom input-asset upload <file>`
+- `loomloom template list`
+- `loomloom template schema <template-id>`
+- `loomloom template download <template-id>`
+- `loomloom template backfill-results <run-id> <xlsx-path>`
+- `loomloom template validate-file <template-id> <xlsx-path>`
+- `loomloom template submit-file <template-id> <xlsx-path>`
+- `loomloom run submit <template-id> -f rows.jsonl`
+- `loomloom run watch <run-id>`
+- `loomloom artifact list <run-id>`
+- `loomloom artifact download <run-id>`
 
 ## Large Local Files
 
 If the user wants to batch-process local code files, large text files, or local images,
 do not paste those files into the agent context when avoidable. Prefer:
 
-1. `assemble-flow input-asset upload <file>`
+1. `loomloom input-asset upload <file>`
 2. keep the returned `input_asset_id`
 3. continue preparing the structured JSONL / Excel input in smaller steps
 
@@ -145,8 +145,8 @@ Excel template workflow.
 
 When using:
 
-- `assemble-flow template submit-file <template-id> <xlsx-path>`
-- `assemble-flow template backfill-results <run-id> <xlsx-path>`
+- `loomloom template submit-file <template-id> <xlsx-path>`
+- `loomloom template backfill-results <run-id> <xlsx-path>`
 
 assume the workbook itself is the source of truth. By default, `template backfill-results`
 writes results back into the same workbook path. Only use `--output-file` when the
@@ -154,7 +154,7 @@ user explicitly wants a separate workbook copy.
 
 ## 控制台访问
 
-当用户询问如何访问 AssembleFlow / BatchJob 控制台，或者 agent 成功提交、执行、
+当用户询问如何访问 LoomLoom / BatchJob 控制台，或者 agent 成功提交、执行、
 回填了一次批处理任务后，应主动提示当前测试环境控制台入口：
 
 - 控制台页面：`https://batchjob-test.shengsuanyun.com/home/workflow-runs`

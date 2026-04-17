@@ -4,8 +4,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/SSYCloud/AssembleFlow/cli/internal/client"
-	"github.com/SSYCloud/AssembleFlow/cli/internal/version"
+	"github.com/SSYCloud/loomloom/cli/internal/client"
+	"github.com/SSYCloud/loomloom/cli/internal/version"
 	"github.com/spf13/cobra"
 )
 
@@ -25,14 +25,14 @@ func NewRootCmd() *cobra.Command {
 	}
 
 	cmd := &cobra.Command{
-		Use:           "assemble-flow",
-		Short:         "Developer CLI for AssembleFlow workflows",
+		Use:           "loomloom",
+		Short:         "Developer CLI for LoomLoom workflows",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		Version:       version.Version,
 	}
 
-	cmd.PersistentFlags().StringVarP(&opts.server, "server", "s", opts.server, "AssembleFlow base URL or host")
+	cmd.PersistentFlags().StringVarP(&opts.server, "server", "s", opts.server, "LoomLoom base URL or host")
 	cmd.PersistentFlags().StringVarP(&opts.token, "token", "t", opts.token, "Bearer token")
 	cmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", opts.timeout, "HTTP timeout")
 	cmd.PersistentFlags().StringVarP(&opts.output, "output", "o", opts.output, "Output format: text|json")

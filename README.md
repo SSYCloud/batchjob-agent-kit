@@ -1,18 +1,18 @@
-# AssembleFlow README
+# LoomLoom README
 
-# AssembleFlow
+# LoomLoom
 
 > **批量内容生成平台** —— 用自然语言驱动 AI，批量完成文案、图片、视频生成任务。
 
 
-> 由胜算云出品 · [github.com/SSYCloud/AssembleFlow](http://github.com/SSYCloud/AssembleFlow)
+> 由胜算云出品 · [github.com/SSYCloud/loomloom](http://github.com/SSYCloud/loomloom)
 
 
 ---
 
 ## ✨ 它能做什么？
 
-AssembleFlow 是一个面向 AI 驱动批量内容生产的平台工具。你不需要写代码，只需用自然语言告诉 AI 你想做什么，它会自动完成从模板下载、数据填写、任务提交到结果下载的全流程。
+LoomLoom 是一个面向 AI 驱动批量内容生产的平台工具。你不需要写代码，只需用自然语言告诉 AI 你想做什么，它会自动完成从模板下载、数据填写、任务提交到结果下载的全流程。
 
 **典型场景：**
 
@@ -24,7 +24,7 @@ AssembleFlow 是一个面向 AI 驱动批量内容生产的平台工具。你不
 
 ## 🤖 支持的 AI 平台
 
-安装 AssembleFlow 后，以下平台将获得操作批处理任务的「技能包」：
+安装 LoomLoom 后，以下平台将获得操作批处理任务的「技能包」：
 
 | 平台 | 支持状态 |
 | --- | --- |
@@ -41,7 +41,7 @@ AssembleFlow 是一个面向 AI 驱动批量内容生产的平台工具。你不
 把以下这段话发给 Codex / Claude / OpenClaw，将 `your-token` 替换为你的真实 Token，Agent 会自动完成安装与配置：
 
 ```
-请你去这个 GitHub 项目安装 AssembleFlow：https://github.com/SSYCloud/AssembleFlow
+请你去这个 GitHub 项目安装 LoomLoom：https://github.com/SSYCloud/loomloom
 我的服务器地址是 https://batchjob-test.shengsuanyun.com/batch，Token 是 your-token
 安装好之后帮我跑一下 doctor 检查是否正常
 ```
@@ -52,16 +52,16 @@ AssembleFlow 是一个面向 AI 驱动批量内容生产的平台工具。你不
 
 ```bash
 # 默认安装（Codex 技能包）
-curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/SSYCloud/loomloom/main/install.sh | bash
 
 # Claude 用户
-curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/install.sh | bash -s -- --agent claude
+curl -fsSL https://raw.githubusercontent.com/SSYCloud/loomloom/main/install.sh | bash -s -- --agent claude
 
 # OpenClaw 用户
-curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/install.sh | bash -s -- --agent openclaw
+curl -fsSL https://raw.githubusercontent.com/SSYCloud/loomloom/main/install.sh | bash -s -- --agent openclaw
 
 # 指定版本
-curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/install.sh | bash -s -- --version v0.1.0
+curl -fsSL https://raw.githubusercontent.com/SSYCloud/loomloom/main/install.sh | bash -s -- --version v0.1.0
 ```
 
 > 如果系统有 Homebrew，安装脚本会优先使用 Homebrew 安装 CLI；可加 `--no-brew` 改用二进制包。
@@ -71,22 +71,22 @@ curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/install.
 
 ```powershell
 # 默认安装
-irm https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/SSYCloud/loomloom/main/install.ps1 | iex
 
 # Claude 用户
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/install.ps1))) -Agent claude
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/SSYCloud/loomloom/main/install.ps1))) -Agent claude
 
 # OpenClaw 用户
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/install.ps1))) -Agent openclaw
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/SSYCloud/loomloom/main/install.ps1))) -Agent openclaw
 ```
 
-> Windows 默认安装路径：`$HOME\AppData\Local\Programs\assemble-flow`，若未自动加入 PATH，请手动添加。
+> Windows 默认安装路径：`$HOME\AppData\Local\Programs\loomloom`，若未自动加入 PATH，请手动添加。
 
 
 **Homebrew（仅 CLI）：**
 
 ```bash
-brew install ssycloud/tap/assemble-flow
+brew install ssycloud/tap/loomloom
 ```
 
 > 注意：Homebrew 仅安装 CLI，不含技能包。如需技能包请使用上方安装脚本。
@@ -109,7 +109,7 @@ export BATCHJOB_TOKEN="your-token"
 ## ✅ 验证安装
 
 ```bash
-assemble-flow doctor
+loomloom doctor
 ```
 
 看到绿色提示即表示环境配置正常，可以开始使用 🎉
@@ -131,22 +131,22 @@ assemble-flow doctor
 
 ```bash
 # 1. 下载模板
-assemble-flow template download text-image-v1 --output-file ./task.xlsx
+loomloom template download text-image-v1 --output-file ./task.xlsx
 
 # 2. 填写 Excel 后，校验格式
-assemble-flow template validate-file text-image-v1 ./task.xlsx
+loomloom template validate-file text-image-v1 ./task.xlsx
 
 # 3. 提交任务
-assemble-flow template submit-file text-image-v1 ./task.xlsx
+loomloom template submit-file text-image-v1 ./task.xlsx
 
 # 4. 监控进度（获取 run-id 后执行）
-assemble-flow run watch <run-id>
+loomloom run watch <run-id>
 
 # 5. 结果回写到 Excel
-assemble-flow template backfill-results <run-id> ./task.xlsx
+loomloom template backfill-results <run-id> ./task.xlsx
 
 # 6. 下载生成文件
-assemble-flow artifact download <run-id> --output-dir ./downloads
+loomloom artifact download <run-id> --output-dir ./downloads
 ```
 
 ---
@@ -188,8 +188,8 @@ assemble-flow artifact download <run-id> --output-dir ./downloads
 当参考文本较大，不适合直接填入 Excel 时，先上传文件获取 ID：
 
 ```bash
-assemble-flow input-asset upload ./my-reference.txt
-assemble-flow input-asset upload ./diagram.png --content-type image/png
+loomloom input-asset upload ./my-reference.txt
+loomloom input-asset upload ./diagram.png --content-type image/png
 ```
 
 返回的 `input_asset_id` 填入模板"参考文本"字段即可。
@@ -217,18 +217,18 @@ assemble-flow input-asset upload ./diagram.png --content-type image/png
 
 | 命令 | 说明 |
 | --- | --- |
-| `assemble-flow doctor` | 检查环境配置是否正常 |
-| `assemble-flow template list` | 查看可用模板列表 |
-| `assemble-flow template schema <id>` | 查看模板字段说明 |
-| `assemble-flow template download <id>` | 下载 Excel 模板 |
-| `assemble-flow template validate-file <id> <xlsx>` | 校验 Excel 填写格式 |
-| `assemble-flow template submit-file <id> <xlsx>` | 提交任务 |
-| `assemble-flow template backfill-results <run-id> <xlsx>` | 结果回写到 Excel |
-| `assemble-flow run submit <id> -f rows.jsonl` | 高级：JSONL 方式提交 |
-| `assemble-flow run watch <run-id>` | 监控任务进度 |
-| `assemble-flow artifact list <run-id>` | 查看生成文件列表 |
-| `assemble-flow artifact download <run-id>` | 下载所有生成文件 |
-| `assemble-flow input-asset upload <file>` | 上传大文件获取 ID |
+| `loomloom doctor` | 检查环境配置是否正常 |
+| `loomloom template list` | 查看可用模板列表 |
+| `loomloom template schema <id>` | 查看模板字段说明 |
+| `loomloom template download <id>` | 下载 Excel 模板 |
+| `loomloom template validate-file <id> <xlsx>` | 校验 Excel 填写格式 |
+| `loomloom template submit-file <id> <xlsx>` | 提交任务 |
+| `loomloom template backfill-results <run-id> <xlsx>` | 结果回写到 Excel |
+| `loomloom run submit <id> -f rows.jsonl` | 高级：JSONL 方式提交 |
+| `loomloom run watch <run-id>` | 监控任务进度 |
+| `loomloom artifact list <run-id>` | 查看生成文件列表 |
+| `loomloom artifact download <run-id>` | 下载所有生成文件 |
+| `loomloom input-asset upload <file>` | 上传大文件获取 ID |
 
 ---
 
@@ -238,19 +238,19 @@ assemble-flow input-asset upload ./diagram.png --content-type image/png
 
 ```bash
 # 全部卸载
-curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/SSYCloud/loomloom/main/uninstall.sh | bash
 
 # 仅卸载 CLI
-curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/uninstall.sh | bash -s -- --cli-only
+curl -fsSL https://raw.githubusercontent.com/SSYCloud/loomloom/main/uninstall.sh | bash -s -- --cli-only
 
 # 仅卸载技能包
-curl -fsSL https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/uninstall.sh | bash -s -- --skill-only
+curl -fsSL https://raw.githubusercontent.com/SSYCloud/loomloom/main/uninstall.sh | bash -s -- --skill-only
 ```
 
 **Windows：**
 
 ```powershell
-irm https://raw.githubusercontent.com/SSYCloud/AssembleFlow/main/uninstall.ps1 | iex
+irm https://raw.githubusercontent.com/SSYCloud/loomloom/main/uninstall.ps1 | iex
 ```
 
 ---
@@ -277,6 +277,6 @@ Mac 用户按 `Command + 空格` 搜索「终端」；Windows 用户按 `Win 键
 
 ## 🔗 相关链接
 
-- 📦 GitHub 项目：[github.com/SSYCloud/AssembleFlow](http://github.com/SSYCloud/AssembleFlow)
+- 📦 GitHub 项目：[github.com/SSYCloud/loomloom](http://github.com/SSYCloud/loomloom)
 - 📊 任务进度看板：[batchjob-test.shengsuanyun.com/home](http://batchjob-test.shengsuanyun.com/home)
 - 🏢 胜算云官网：[shengsuanyun.com](http://shengsuanyun.com)

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO="SSYCloud/AssembleFlow"
+REPO="SSYCloud/loomloom"
 VERSION="${VERSION:-latest}"
 AGENT="codex"
 INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/bin}"
@@ -14,7 +14,7 @@ Usage: install.sh [options]
 
 Options:
   --agent <codex|claude|openclaw>   Install the matching skill pack (default: codex)
-  --install-dir <path>     Directory for assemble-flow (default: ~/.local/bin)
+  --install-dir <path>     Directory for loomloom (default: ~/.local/bin)
   --skill-dir <path>       Override the destination directory for SKILL.md
   --version <tag|latest>   GitHub release tag to install (default: latest)
   --no-brew                Force GitHub Release install even if Homebrew is available
@@ -82,13 +82,13 @@ resolve_skill_dir() {
   fi
   case "$AGENT" in
     codex)
-      printf '%s\n' "$HOME/.codex/skills/assemble-flow"
+      printf '%s\n' "$HOME/.codex/skills/loomloom"
       ;;
     claude)
-      printf '%s\n' "$HOME/.claude/skills/assemble-flow"
+      printf '%s\n' "$HOME/.claude/skills/loomloom"
       ;;
     openclaw)
-      printf '%s\n' "$HOME/.openclaw/workspace/skills/assemble-flow"
+      printf '%s\n' "$HOME/.openclaw/workspace/skills/loomloom"
       ;;
     *)
       echo "unsupported agent for automatic skill install: $AGENT" >&2
@@ -157,7 +157,7 @@ verify_checksum() {
 }
 
 require_cmd curl
-SKILL_ASSET="assemble-flow-skills.tar.gz"
+SKILL_ASSET="loomloom-skills.tar.gz"
 CHECKSUM_ASSET="checksums.txt"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
@@ -167,11 +167,11 @@ if can_use_homebrew; then
 else
   require_cmd tar
   TAG="$(resolve_tag)"
-  CLI_ASSET="assemble-flow-${OS}-${ARCH}.tar.gz"
+  CLI_ASSET="loomloom-${OS}-${ARCH}.tar.gz"
   BASE_URL="https://github.com/${REPO}/releases/download/${TAG}"
 fi
 
-echo "AssembleFlow installer"
+echo "LoomLoom installer"
 echo "repo: $REPO"
 echo "version: $TAG"
 echo "agent: $AGENT"
@@ -184,19 +184,19 @@ echo "skill dir: $(resolve_skill_dir)"
 echo
 
 if can_use_homebrew; then
-  if brew list --versions assemble-flow >/dev/null 2>&1; then
-    brew upgrade assemble-flow || true
+  if brew list --versions loomloom >/dev/null 2>&1; then
+    brew upgrade loomloom || true
   else
-    brew install ssycloud/tap/assemble-flow
+    brew install ssycloud/tap/loomloom
   fi
-  local_cli_path="$INSTALL_DIR/assemble-flow"
+  local_cli_path="$INSTALL_DIR/loomloom"
   if [[ -f "$local_cli_path" ]]; then
     rm -f "$local_cli_path"
     echo "removed shadowing local CLI: $local_cli_path"
   fi
-  CLI_PATH="$(command -v assemble-flow || true)"
+  CLI_PATH="$(command -v loomloom || true)"
   if [[ -z "$CLI_PATH" ]]; then
-    echo "failed to resolve assemble-flow after Homebrew install" >&2
+    echo "failed to resolve loomloom after Homebrew install" >&2
     exit 1
   fi
 else
@@ -207,8 +207,8 @@ else
 
   mkdir -p "$TMP_DIR/cli"
   tar -xzf "$TMP_DIR/$CLI_ASSET" -C "$TMP_DIR/cli"
-  install -m 0755 "$TMP_DIR/cli/assemble-flow" "$INSTALL_DIR/assemble-flow"
-  CLI_PATH="$INSTALL_DIR/assemble-flow"
+  install -m 0755 "$TMP_DIR/cli/loomloom" "$INSTALL_DIR/loomloom"
+  CLI_PATH="$INSTALL_DIR/loomloom"
 fi
 
 [[ -n "${BASE_URL:-}" ]] || BASE_URL="https://github.com/${REPO}/releases/download/$(resolve_tag)"
@@ -223,7 +223,7 @@ mkdir -p "$TMP_DIR/skills"
 tar -xzf "$TMP_DIR/$SKILL_ASSET" -C "$TMP_DIR/skills"
 FINAL_SKILL_DIR="$(resolve_skill_dir)"
 mkdir -p "$FINAL_SKILL_DIR"
-install -m 0644 "$TMP_DIR/skills/skills/$AGENT/assemble-flow/SKILL.md" "$FINAL_SKILL_DIR/SKILL.md"
+install -m 0644 "$TMP_DIR/skills/skills/$AGENT/loomloom/SKILL.md" "$FINAL_SKILL_DIR/SKILL.md"
 
 echo "installed:"
 echo "  $CLI_PATH"
@@ -232,4 +232,4 @@ echo
 echo "next:"
 echo "  export BATCHJOB_SERVER=https://batchjob-test.shengsuanyun.com/batch"
 echo "  export BATCHJOB_TOKEN=your-token"
-echo "  assemble-flow doctor"
+echo "  loomloom doctor"

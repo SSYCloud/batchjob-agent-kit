@@ -1,6 +1,6 @@
 param(
   [string]$Agent = "codex",
-  [string]$InstallDir = "$HOME\AppData\Local\Programs\assemble-flow",
+  [string]$InstallDir = "$HOME\AppData\Local\Programs\loomloom",
   [string]$SkillDir = "",
   [switch]$CliOnly,
   [switch]$SkillOnly
@@ -12,9 +12,9 @@ function Resolve-SkillDir {
   param([string]$AgentName, [string]$Override)
   if ($Override) { return $Override }
   switch ($AgentName) {
-    "codex" { return "$HOME\.codex\skills\assemble-flow" }
-    "claude" { return "$HOME\.claude\skills\assemble-flow" }
-    "openclaw" { return "$HOME\.openclaw\workspace\skills\assemble-flow" }
+    "codex" { return "$HOME\.codex\skills\loomloom" }
+    "claude" { return "$HOME\.claude\skills\loomloom" }
+    "openclaw" { return "$HOME\.openclaw\workspace\skills\loomloom" }
     default { throw "unsupported agent: $AgentName" }
   }
 }
@@ -34,11 +34,11 @@ function Uninstall-HomebrewCli {
   $brewCmd = Get-Command brew -ErrorAction SilentlyContinue
   if (-not $brewCmd) { return $false }
 
-  & $brewCmd.Source list --versions assemble-flow *> $null
+  & $brewCmd.Source list --versions loomloom *> $null
   if ($LASTEXITCODE -ne 0) { return $false }
 
-  & $brewCmd.Source uninstall assemble-flow
-  Write-Host "removed Homebrew formula: assemble-flow"
+  & $brewCmd.Source uninstall loomloom
+  Write-Host "removed Homebrew formula: loomloom"
   return $true
 }
 
@@ -46,7 +46,7 @@ if ($removeCli) {
   if (Uninstall-HomebrewCli) {
     $removedAny = $true
   }
-  $cliPath = Join-Path $InstallDir "assemble-flow.exe"
+  $cliPath = Join-Path $InstallDir "loomloom.exe"
   if (Test-Path -LiteralPath $cliPath) {
     Remove-Item -LiteralPath $cliPath -Force
     Write-Host "removed: $cliPath"

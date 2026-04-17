@@ -17,7 +17,7 @@ var (
 )
 
 const (
-	repoOwnerRepo      = "SSYCloud/AssembleFlow"
+	repoOwnerRepo      = "SSYCloud/loomloom"
 	defaultReleaseAPI  = "https://api.github.com/repos/" + repoOwnerRepo + "/releases/latest"
 	defaultHTTPTimeout = 5 * time.Second
 )
@@ -72,7 +72,7 @@ func fetchLatestVersion(ctx context.Context, apiURL string) (string, error) {
 		return "", err
 	}
 	req.Header.Set("Accept", "application/vnd.github+json")
-	req.Header.Set("User-Agent", "assemble-flow/"+strings.TrimSpace(Version))
+	req.Header.Set("User-Agent", "loomloom/"+strings.TrimSpace(Version))
 
 	httpClient := &http.Client{Timeout: defaultHTTPTimeout}
 	resp, err := httpClient.Do(req)

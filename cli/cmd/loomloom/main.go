@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/SSYCloud/AssembleFlow/cli/internal/cmd"
+	"github.com/SSYCloud/loomloom/cli/internal/cmd"
 )
 
 func main() {

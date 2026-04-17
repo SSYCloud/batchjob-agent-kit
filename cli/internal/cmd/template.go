@@ -127,7 +127,7 @@ func (r *submitTemplateFileResponse) UnmarshalJSON(data []byte) error {
 func newTemplateCmd(opts *rootOptions) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "template",
-		Short: "Discover hosted AssembleFlow templates",
+		Short: "Discover hosted LoomLoom templates",
 	}
 
 	cmd.AddCommand(

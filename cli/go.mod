@@ -1,4 +1,4 @@
-module github.com/SSYCloud/AssembleFlow/cli
+module github.com/SSYCloud/loomloom/cli
 
 go 1.24.6
 

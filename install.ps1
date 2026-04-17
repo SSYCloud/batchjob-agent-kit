@@ -1,22 +1,22 @@
 param(
   [string]$Agent = "codex",
-  [string]$InstallDir = "$HOME\AppData\Local\Programs\assemble-flow",
+  [string]$InstallDir = "$HOME\AppData\Local\Programs\loomloom",
   [string]$SkillDir = "",
   [string]$Version = "latest"
 )
 
 $ErrorActionPreference = "Stop"
 
-$Repo = "SSYCloud/AssembleFlow"
+$Repo = "SSYCloud/loomloom"
 $ApiBase = "https://api.github.com/repos/$Repo"
 
 function Resolve-SkillDir {
   param([string]$AgentName, [string]$Override)
   if ($Override) { return $Override }
   switch ($AgentName) {
-    "codex" { return "$HOME\.codex\skills\assemble-flow" }
-    "claude" { return "$HOME\.claude\skills\assemble-flow" }
-    "openclaw" { return "$HOME\.openclaw\workspace\skills\assemble-flow" }
+    "codex" { return "$HOME\.codex\skills\loomloom" }
+    "claude" { return "$HOME\.claude\skills\loomloom" }
+    "openclaw" { return "$HOME\.openclaw\workspace\skills\loomloom" }
     default { throw "unsupported agent: $AgentName" }
   }
 }
@@ -24,7 +24,7 @@ function Resolve-SkillDir {
 function Resolve-Tag {
   param([string]$Requested)
   if ($Requested -ne "latest") { return $Requested }
-  $resp = Invoke-RestMethod -Uri "$ApiBase/releases/latest" -Headers @{ Accept = "application/vnd.github+json"; "User-Agent" = "assemble-flow-installer" }
+  $resp = Invoke-RestMethod -Uri "$ApiBase/releases/latest" -Headers @{ Accept = "application/vnd.github+json"; "User-Agent" = "loomloom-installer" }
   if (-not $resp.tag_name) { throw "failed to resolve latest release tag" }
   return [string]$resp.tag_name
 }
@@ -61,19 +61,19 @@ $arch = switch ($env:PROCESSOR_ARCHITECTURE.ToLowerInvariant()) {
 }
 
 $tag = Resolve-Tag -Requested $Version
-$cliAsset = "assemble-flow-windows-$arch.zip"
-$skillsAsset = "assemble-flow-skills.zip"
+$cliAsset = "loomloom-windows-$arch.zip"
+$skillsAsset = "loomloom-skills.zip"
 $checksumsAsset = "checksums.txt"
 $baseUrl = "https://github.com/$Repo/releases/download/$tag"
 
-$tmpDir = Join-Path ([System.IO.Path]::GetTempPath()) ("AssembleFlow-" + [System.Guid]::NewGuid().ToString("N"))
+$tmpDir = Join-Path ([System.IO.Path]::GetTempPath()) ("LoomLoom-" + [System.Guid]::NewGuid().ToString("N"))
 New-Item -ItemType Directory -Path $tmpDir | Out-Null
 try {
   $cliZip = Join-Path $tmpDir $cliAsset
   $skillsZip = Join-Path $tmpDir $skillsAsset
   $checksumsPath = Join-Path $tmpDir $checksumsAsset
 
-  Write-Host "AssembleFlow installer"
+  Write-Host "LoomLoom installer"
   Write-Host "repo: $Repo"
   Write-Host "version: $tag"
   Write-Host "agent: $Agent"
@@ -89,7 +89,7 @@ try {
   $cliExtract = Join-Path $tmpDir "cli"
   Expand-Archive -LiteralPath $cliZip -DestinationPath $cliExtract -Force
   New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
-  Copy-Item -LiteralPath (Join-Path $cliExtract "assemble-flow.exe") -Destination (Join-Path $InstallDir "assemble-flow.exe") -Force
+  Copy-Item -LiteralPath (Join-Path $cliExtract "loomloom.exe") -Destination (Join-Path $InstallDir "loomloom.exe") -Force
 
   Invoke-WebRequest -Uri "$baseUrl/$skillsAsset" -OutFile $skillsZip
   Assert-Checksum -AssetName $skillsAsset -FilePath $skillsZip -ChecksumMap $checksumMap
@@ -98,17 +98,17 @@ try {
   Expand-Archive -LiteralPath $skillsZip -DestinationPath $skillsExtract -Force
   $finalSkillDir = Resolve-SkillDir -AgentName $Agent -Override $SkillDir
   New-Item -ItemType Directory -Force -Path $finalSkillDir | Out-Null
-  Copy-Item -LiteralPath (Join-Path $skillsExtract "skills\$Agent\assemble-flow\SKILL.md") -Destination (Join-Path $finalSkillDir "SKILL.md") -Force
+  Copy-Item -LiteralPath (Join-Path $skillsExtract "skills\$Agent\loomloom\SKILL.md") -Destination (Join-Path $finalSkillDir "SKILL.md") -Force
 
   Write-Host "installed:"
-  Write-Host "  $(Join-Path $InstallDir 'assemble-flow.exe')"
+  Write-Host "  $(Join-Path $InstallDir 'loomloom.exe')"
   Write-Host "  $(Join-Path (Resolve-SkillDir -AgentName $Agent -Override $SkillDir) 'SKILL.md')"
   Write-Host ""
   Write-Host "next:"
   Write-Host "  Add $InstallDir to PATH if needed"
   Write-Host "  `$env:BATCHJOB_SERVER='https://batchjob-test.shengsuanyun.com/batch'"
   Write-Host "  `$env:BATCHJOB_TOKEN='your-token'"
-  Write-Host "  assemble-flow doctor"
+  Write-Host "  loomloom doctor"
 }
 finally {
   if (Test-Path $tmpDir) {
