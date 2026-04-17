@@ -75,7 +75,7 @@ func newTemplateBackfillResultsCmd(opts *rootOptions) *cobra.Command {
 				return err
 			}
 
-			rowCount, err := backfillWorkbookResults(workbookPath, targetPath, tasks, artifacts)
+			rowCount, err := backfillWorkbookResults(ctx, workbookPath, targetPath, tasks, artifacts)
 			if err != nil {
 				return err
 			}
@@ -169,7 +169,7 @@ func resolveBackfillOutputPath(outputPath string, workbookPath string) (string, 
 	return resolveFilePath(outputPath, defaultName)
 }
 
-func backfillWorkbookResults(inputPath, outputPath string, tasks []runTaskEntry, artifacts []artifactEntry) (int, error) {
+func backfillWorkbookResults(ctx context.Context, inputPath, outputPath string, tasks []runTaskEntry, artifacts []artifactEntry) (int, error) {
 	f, err := excelize.OpenFile(inputPath)
 	if err != nil {
 		return 0, fmt.Errorf("open workbook: %w", err)
@@ -190,6 +190,11 @@ func backfillWorkbookResults(inputPath, outputPath string, tasks []runTaskEntry,
 	headers := rows[0]
 	if len(headers) == 0 {
 		return 0, fmt.Errorf("data sheet row 1 (header) is empty")
+	}
+
+	artifacts, err = hydrateTextArtifacts(ctx, artifacts)
+	if err != nil {
+		return 0, err
 	}
 
 	resultCols := ensureResultColumns(f, templateDataSheetName, headers)
@@ -227,6 +232,28 @@ func backfillWorkbookResults(inputPath, outputPath string, tasks []runTaskEntry,
 		return 0, fmt.Errorf("write backfilled workbook: %w", err)
 	}
 	return rowCount, nil
+}
+
+func hydrateTextArtifacts(ctx context.Context, artifacts []artifactEntry) ([]artifactEntry, error) {
+	hydrated := make([]artifactEntry, len(artifacts))
+	copy(hydrated, artifacts)
+	for i, artifact := range hydrated {
+		if !strings.HasPrefix(strings.TrimSpace(artifact.MimeType), "text/") {
+			continue
+		}
+		if strings.TrimSpace(artifact.InlineText) != "" {
+			continue
+		}
+		if strings.TrimSpace(artifact.AccessURL) == "" {
+			continue
+		}
+		data, err := downloadURL(ctx, artifact.AccessURL)
+		if err != nil {
+			return nil, fmt.Errorf("download text artifact %s: %w", artifact.ArtifactID, err)
+		}
+		hydrated[i].InlineText = string(data)
+	}
+	return hydrated, nil
 }
 
 func validateWorkbookMetaSheet(f *excelize.File) error {

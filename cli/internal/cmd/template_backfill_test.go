@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"path/filepath"
 	"testing"
@@ -199,7 +201,7 @@ func TestBackfillWorkbookResults_UsesTaskLevelStatusAndError(t *testing.T) {
 		{TaskID: "task-1", SourceRowIndex: 0, MimeType: "text/plain", InlineText: "hello world"},
 	}
 
-	rowCount, err := backfillWorkbookResults(inputPath, outputPath, tasks, artifacts)
+	rowCount, err := backfillWorkbookResults(context.Background(), inputPath, outputPath, tasks, artifacts)
 	if err != nil {
 		t.Fatalf("backfillWorkbookResults returned error: %v", err)
 	}
@@ -243,5 +245,73 @@ func TestBackfillWorkbookResults_UsesTaskLevelStatusAndError(t *testing.T) {
 	}
 	if got := rows[2][6]; got != "task-2" {
 		t.Fatalf("unexpected row 2 task id: %q", got)
+	}
+}
+
+func TestBackfillWorkbookResults_DownloadsTextArtifactsFromAccessURL(t *testing.T) {
+	dir := t.TempDir()
+	inputPath := filepath.Join(dir, "input.xlsx")
+	outputPath := filepath.Join(dir, "output.xlsx")
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte("downloaded text output"))
+	}))
+	defer server.Close()
+
+	f := excelize.NewFile()
+	metaSheet, err := f.NewSheet(templateMetaSheetName)
+	if err != nil {
+		t.Fatalf("create meta sheet: %v", err)
+	}
+	dataSheet, err := f.NewSheet(templateDataSheetName)
+	if err != nil {
+		t.Fatalf("create data sheet: %v", err)
+	}
+	f.DeleteSheet("Sheet1")
+	f.SetActiveSheet(dataSheet)
+	_ = metaSheet
+	if err := f.SetSheetRow(templateMetaSheetName, "A1", &[]string{"__template_id", "text-v1"}); err != nil {
+		t.Fatalf("set meta row 1: %v", err)
+	}
+	if err := f.SetSheetRow(templateMetaSheetName, "A2", &[]string{"__template_version", "v1"}); err != nil {
+		t.Fatalf("set meta row 2: %v", err)
+	}
+	if err := f.SetSheetRow(templateDataSheetName, "A1", &[]string{"输入.prompt"}); err != nil {
+		t.Fatalf("set data header: %v", err)
+	}
+	if err := f.SetSheetRow(templateDataSheetName, "A2", &[]string{"row-1"}); err != nil {
+		t.Fatalf("set row 1: %v", err)
+	}
+	if err := f.SaveAs(inputPath); err != nil {
+		t.Fatalf("save input workbook: %v", err)
+	}
+
+	tasks := []runTaskEntry{
+		{TaskID: "task-1", SourceRowIndex: 0, Status: "completed"},
+	}
+	artifacts := []artifactEntry{
+		{ArtifactID: "artifact-1", TaskID: "task-1", SourceRowIndex: 0, MimeType: "text/plain", AccessURL: server.URL},
+	}
+
+	rowCount, err := backfillWorkbookResults(context.Background(), inputPath, outputPath, tasks, artifacts)
+	if err != nil {
+		t.Fatalf("backfillWorkbookResults returned error: %v", err)
+	}
+	if rowCount != 1 {
+		t.Fatalf("expected 1 row, got %d", rowCount)
+	}
+
+	out, err := excelize.OpenFile(outputPath)
+	if err != nil {
+		t.Fatalf("open output workbook: %v", err)
+	}
+	defer func() { _ = out.Close() }()
+
+	rows, err := out.GetRows(templateDataSheetName)
+	if err != nil {
+		t.Fatalf("read output rows: %v", err)
+	}
+	if got := rows[1][3]; got != "downloaded text output" {
+		t.Fatalf("unexpected row 1 text output: %q", got)
 	}
 }
