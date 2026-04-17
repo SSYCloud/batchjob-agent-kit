@@ -24,12 +24,9 @@ Use this skill when the user is referring to our AssembleFlow-hosted batch-proce
    `assemble-flow doctor`
 3. Upload reusable raw input files when the local file is large and should not be pasted into agent context:
    `assemble-flow input-asset upload <file>`
-4. Discover executable models when needed:
-   `assemble-flow model list --step-type image-generate`
-   `assemble-flow model get <model-id>`
-5. Discover templates:
+4. Discover templates:
    `assemble-flow template list`
-6. Inspect schema:
+5. Inspect schema:
    `assemble-flow template schema <template-id>`
 7. Default to the official Excel workflow:
    `assemble-flow template download <template-id>`

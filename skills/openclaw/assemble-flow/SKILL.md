@@ -27,10 +27,7 @@ Use this skill when the user is referring to our AssembleFlow-hosted batch-proce
    `assemble-flow doctor`
 2. Upload reusable raw input files when the local file is large and should not be pasted into agent context:
    `assemble-flow input-asset upload <file>`
-3. Discover executable models when step-level model choice matters:
-   `assemble-flow model list --step-type image-generate`
-   `assemble-flow model get <model-id>`
-4. Discover available templates:
+3. Discover available templates:
    `assemble-flow template list`
 5. Inspect one template:
    `assemble-flow template schema <template-id>`
@@ -118,8 +115,6 @@ The public CLI MVP currently supports:
 
 - `assemble-flow doctor`
 - `assemble-flow input-asset upload <file>`
-- `assemble-flow model list --step-type <step-type>`
-- `assemble-flow model get <model-id>`
 - `assemble-flow template list`
 - `assemble-flow template schema <template-id>`
 - `assemble-flow template download <template-id>`

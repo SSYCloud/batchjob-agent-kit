@@ -40,7 +40,6 @@ func NewRootCmd() *cobra.Command {
 	cmd.AddCommand(
 		newDoctorCmd(opts),
 		newInputAssetCmd(opts),
-		newModelCmd(opts),
 		newRunCmd(opts),
 		newTemplateCmd(opts),
 		newArtifactCmd(opts),

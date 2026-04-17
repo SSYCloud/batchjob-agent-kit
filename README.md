@@ -126,32 +126,6 @@ assemble-flow doctor
 
 ---
 
-## 🤖 当前支持的 AI 模型
-
-| 任务类型 | 模型 | 适用模板 |
-| --- | --- | --- |
-| 📄 文本生成 | `google/gemini-2.5-flash` | `text-v1` |
-| 🖼️ 图片生成 | `google/gemini-2.5-flash-image` | `text-image-v1` |
-| 🎬 视频生成 | `google/veo3` | `text-image-video-v1` |
-
-> 当前版本固定使用上述模型，后续版本将开放自由切换。
-
-
-查看当前环境可用模型：
-
-```bash
-assemble-flow model list --step-type text-generate
-assemble-flow model list --step-type image-generate
-assemble-flow model list --step-type video-generate
-
-# 按 provider 筛选
-assemble-flow model list --step-type image-generate --provider vertex
-
-# 查看某个模型详情
-assemble-flow model get google/gemini-2.5-flash-image
-```
-
----
 
 ## 🔄 标准工作流（Excel 模板）
 
@@ -255,8 +229,6 @@ assemble-flow input-asset upload ./diagram.png --content-type image/png
 | `assemble-flow artifact list <run-id>` | 查看生成文件列表 |
 | `assemble-flow artifact download <run-id>` | 下载所有生成文件 |
 | `assemble-flow input-asset upload <file>` | 上传大文件获取 ID |
-| `assemble-flow model list --step-type <type>` | 查看可用模型 |
-| `assemble-flow model get <model-id>` | 查看模型详情 |
 
 ---
 
