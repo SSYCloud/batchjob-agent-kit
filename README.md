@@ -5,6 +5,8 @@
 > **批量内容生成平台** —— 用自然语言驱动 AI，批量完成文案、图片、视频生成任务。
 > 由胜算云出品 · [github.com/SSYCloud/loomloom](http://github.com/SSYCloud/loomloom)
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/SSYCloud/loomloom/1-overview)
+
 ---
 
 ## ✨ 它能做什么？
