@@ -246,7 +246,7 @@ loomloom input-asset upload ./diagram.png --content-type image/png
 自定义模板使用 `TemplateSpec JSON` 描述模板步骤、输入字段和字段绑定关系。第一版推荐由 agent 或开发者生成 JSON，再通过 CLI 创建模板版本。
 
 ```bash
-# 1. 查看某类 step 可用模型，并把返回的 model_id 写入 DefaultModelRef.ModelKey
+# 1. 查看某类 step 可用模型，并把返回的 model_id 写入 defaultModelRef.modelKey
 loomloom template-spec models text-generate
 loomloom template-spec models image-generate
 loomloom template-spec models video-generate
@@ -270,6 +270,7 @@ loomloom template-spec submit-workbook <template-id> <version-id> ./input.xlsx
 注意：
 
 - `TemplateSpec JSON` 是模板主数据，Excel workbook 是派生文件。
+- TemplateSpec 文件推荐使用 OpenAPI 暴露的 lowerCamel 字段名，例如 `meta.name`、`steps[].stepId`、`defaultModelRef.modelKey`。
 - 模板版本变化后，应重新下载 workbook。
 - 只有 step 明确开放模型覆盖时，workbook 中才会出现该步骤的模型选择列。
 - `submit-workbook` 会创建真实批量任务，使用 agent 操作时应先向用户确认。

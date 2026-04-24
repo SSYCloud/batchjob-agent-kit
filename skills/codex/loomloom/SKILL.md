@@ -167,8 +167,9 @@ compatible after the template version changes; download a fresh workbook instead
 TemplateSpec authoring guardrails:
 
 - Use `text-generate`, `image-generate`, or `video-generate` execution units unless the user has a documented custom unit.
-- Before choosing `DefaultModelRef.ModelKey`, run `loomloom template-spec models <execution-unit>` and use one of the returned `model_id` values.
-- Only expose a model column when the step has `AllowModelOverride=true` and a field binding to `ParamKey=model`.
+- Use lowerCamel TemplateSpec keys from OpenAPI, such as `meta.name`, `steps[].stepId`, and `defaultModelRef.modelKey`.
+- Before choosing `defaultModelRef.modelKey`, run `loomloom template-spec models <execution-unit>` and use one of the returned `model_id` values.
+- Only expose a model column when the step has `allowModelOverride=true` and a field binding to `paramKey=model`.
 - Do not bind `provider` or `mode`; these routing controls are not exposed through templates.
 
 When using:

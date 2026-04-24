@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -57,15 +58,15 @@ type modelSummary struct {
 }
 
 type templateSpecMeta struct {
-	Name        string `json:"Name"`
-	Description string `json:"Description"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 type templateSpecEnvelope struct {
-	Meta          templateSpecMeta `json:"Meta"`
-	Steps         []any            `json:"Steps"`
-	InputSchema   any              `json:"InputSchema"`
-	FieldBindings []any            `json:"FieldBindings"`
+	Meta          templateSpecMeta `json:"meta"`
+	Steps         []any            `json:"steps"`
+	InputSchema   any              `json:"inputSchema"`
+	FieldBindings []any            `json:"fieldBindings"`
 }
 
 func newTemplateSpecCmd(opts *rootOptions) *cobra.Command {
@@ -180,7 +181,7 @@ func newTemplateSpecCreateCmd(opts *rootOptions) *cobra.Command {
 			}
 			effectiveName := firstNonEmpty(name, spec.Meta.Name)
 			if effectiveName == "" {
-				return errors.New("template name is required; set Meta.Name or pass --name")
+				return errors.New("template name is required; set meta.name or pass --name")
 			}
 			effectiveDescription := firstNonEmpty(description, spec.Meta.Description)
 
@@ -201,8 +202,8 @@ func newTemplateSpecCreateCmd(opts *rootOptions) *cobra.Command {
 
 			var versionResp saveTemplateVersionResponse
 			if err := httpClient.PostJSON(ctx, "/v1/user-templates/"+createResp.TemplateID+"/versions", map[string]any{
-				"versionNote":       strings.TrimSpace(versionNote),
-				"canonicalSpecJson": string(raw),
+				"versionNote":   strings.TrimSpace(versionNote),
+				"canonicalSpec": json.RawMessage(raw),
 			}, &versionResp); err != nil {
 				_ = httpClient.PostJSON(ctx, "/v1/user-templates/"+createResp.TemplateID+":archive", map[string]any{}, nil)
 				return fmt.Errorf("save template version for %s: %w", createResp.TemplateID, err)
@@ -234,8 +235,8 @@ func newTemplateSpecCreateCmd(opts *rootOptions) *cobra.Command {
 			return err
 		},
 	}
-	cmd.Flags().StringVar(&name, "name", "", "Template name override; defaults to Meta.Name")
-	cmd.Flags().StringVar(&description, "description", "", "Template description override; defaults to Meta.Description")
+	cmd.Flags().StringVar(&name, "name", "", "Template name override; defaults to meta.name")
+	cmd.Flags().StringVar(&description, "description", "", "Template description override; defaults to meta.description")
 	cmd.Flags().StringVar(&versionNote, "version-note", "", "Optional note for version 1")
 	return cmd
 }
@@ -401,27 +402,136 @@ func loadTemplateSpecFile(path string) (templateSpecEnvelope, []byte, error) {
 	if len(trimmed) == 0 {
 		return templateSpecEnvelope{}, nil, errors.New("template spec file is empty")
 	}
+	normalized, err := normalizeTemplateSpecJSON(trimmed)
+	if err != nil {
+		return templateSpecEnvelope{}, nil, err
+	}
 	var spec templateSpecEnvelope
-	if err := json.Unmarshal(trimmed, &spec); err != nil {
+	if err := json.Unmarshal(normalized, &spec); err != nil {
 		return templateSpecEnvelope{}, nil, fmt.Errorf("parse TemplateSpec JSON: %w", err)
 	}
 	if strings.TrimSpace(spec.Meta.Name) == "" {
-		return templateSpecEnvelope{}, nil, errors.New("TemplateSpec Meta.Name is required")
+		return templateSpecEnvelope{}, nil, errors.New("TemplateSpec meta.name is required")
 	}
 	if len(spec.Steps) == 0 {
-		return templateSpecEnvelope{}, nil, errors.New("TemplateSpec Steps must not be empty")
+		return templateSpecEnvelope{}, nil, errors.New("TemplateSpec steps must not be empty")
 	}
 	if spec.InputSchema == nil {
-		return templateSpecEnvelope{}, nil, errors.New("TemplateSpec InputSchema is required")
+		return templateSpecEnvelope{}, nil, errors.New("TemplateSpec inputSchema is required")
 	}
 	if spec.FieldBindings == nil {
-		return templateSpecEnvelope{}, nil, errors.New("TemplateSpec FieldBindings is required")
+		return templateSpecEnvelope{}, nil, errors.New("TemplateSpec fieldBindings is required")
 	}
 	var compact bytes.Buffer
-	if err := json.Compact(&compact, trimmed); err != nil {
+	if err := json.Compact(&compact, normalized); err != nil {
 		return templateSpecEnvelope{}, nil, fmt.Errorf("compact TemplateSpec JSON: %w", err)
 	}
 	return spec, compact.Bytes(), nil
+}
+
+func normalizeTemplateSpecJSON(data []byte) ([]byte, error) {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.UseNumber()
+	var value any
+	if err := decoder.Decode(&value); err != nil {
+		return nil, fmt.Errorf("parse TemplateSpec JSON: %w", err)
+	}
+	normalized := normalizeTemplateSpecJSONValue(value)
+	out, err := json.Marshal(normalized)
+	if err != nil {
+		return nil, fmt.Errorf("normalize TemplateSpec JSON: %w", err)
+	}
+	return out, nil
+}
+
+func normalizeTemplateSpecJSONValue(value any) any {
+	switch typed := value.(type) {
+	case map[string]any:
+		keys := make([]string, 0, len(typed))
+		for key := range typed {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+		out := make(map[string]any, len(typed))
+		for _, key := range keys {
+			normalizedKey := normalizeTemplateSpecJSONKey(key)
+			if _, exists := out[normalizedKey]; exists {
+				continue
+			}
+			out[normalizedKey] = normalizeTemplateSpecJSONValue(typed[key])
+		}
+		return out
+	case []any:
+		out := make([]any, 0, len(typed))
+		for _, item := range typed {
+			out = append(out, normalizeTemplateSpecJSONValue(item))
+		}
+		return out
+	default:
+		return value
+	}
+}
+
+func normalizeTemplateSpecJSONKey(key string) string {
+	if normalized, ok := templateSpecJSONKeyAliases[key]; ok {
+		return normalized
+	}
+	return key
+}
+
+var templateSpecJSONKeyAliases = map[string]string{
+	"AcceptedMIMETypes":  "acceptedMimeTypes",
+	"AllowModelOverride": "allowModelOverride",
+	"BindMode":           "bindMode",
+	"DefaultModelRef":    "defaultModelRef",
+	"DefaultValue":       "defaultValue",
+	"DependsOn":          "dependsOn",
+	"Description":        "description",
+	"DisplayName":        "displayName",
+	"DisplayOutputType":  "displayOutputType",
+	"EnumValues":         "enumValues",
+	"Examples":           "examples",
+	"ExecutionUnit":      "executionUnit",
+	"FieldBindings":      "fieldBindings",
+	"FieldKey":           "fieldKey",
+	"Fields":             "fields",
+	"Hidden":             "hidden",
+	"Hint":               "hint",
+	"InputPort":          "inputPort",
+	"InputSchema":        "inputSchema",
+	"InputSummary":       "inputSummary",
+	"Instruction":        "instruction",
+	"Instructions":       "instructions",
+	"Key":                "key",
+	"Kind":               "kind",
+	"Label":              "label",
+	"Literal":            "literal",
+	"MaxValues":          "maxValues",
+	"Meta":               "meta",
+	"ModelKey":           "modelKey",
+	"MultiValue":         "multiValue",
+	"Name":               "name",
+	"Order":              "order",
+	"ParamBindings":      "paramBindings",
+	"ParamKey":           "paramKey",
+	"Placeholder":        "placeholder",
+	"Presentation":       "presentation",
+	"PrimaryOutputType":  "primaryOutputType",
+	"Required":           "required",
+	"SampleRows":         "sampleRows",
+	"Scenario":           "scenario",
+	"Separator":          "separator",
+	"SourceInputKey":     "sourceInputKey",
+	"SourceKind":         "sourceKind",
+	"SourcePort":         "sourcePort",
+	"SourceStepID":       "sourceStepId",
+	"SourceType":         "sourceType",
+	"StaticParams":       "staticParams",
+	"StepID":             "stepId",
+	"Steps":              "steps",
+	"Tags":               "tags",
+	"ValueType":          "valueType",
+	"Widget":             "widget",
 }
 
 func postUserTemplateWorkbook[T any](ctx context.Context, opts *rootOptions, templateID, versionID, workbookPath, endpoint string, extra map[string]string) (T, error) {

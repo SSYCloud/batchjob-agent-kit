@@ -33,6 +33,12 @@ func TestLoadTemplateSpecFile_ValidSpec(t *testing.T) {
 	if len(raw) == 0 || raw[0] != '{' {
 		t.Fatalf("expected compact JSON bytes, got %q", string(raw))
 	}
+	if !strings.Contains(string(raw), `"meta"`) {
+		t.Fatalf("expected normalized lowerCamel TemplateSpec JSON, got %s", string(raw))
+	}
+	if strings.Contains(string(raw), `"Meta"`) {
+		t.Fatalf("expected PascalCase keys to be normalized, got %s", string(raw))
+	}
 }
 
 func TestLoadTemplateSpecFile_MissingName(t *testing.T) {
